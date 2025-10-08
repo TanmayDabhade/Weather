@@ -9,14 +9,22 @@ import Foundation
 import CoreLocation
 
 class WeatherManager{
+    private let apiKey: String
+
+    init() {
+        guard let path = Bundle.main.path(forResource: "Info", ofType: "plist"),
+              let plist = NSDictionary(contentsOfFile: path),
+              let key = plist["OPENWEATHERAPI"] as? String else {
+            fatalError("API Key not found in Info.plist")
+        }
+        self.apiKey = key
+    }
+
     //Two parameters latitude and longitude are in Core Location generated, we are using async and await and throws for errors.
     func getCurrentWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) async throws -> ResponseBody {
         
         
-//        guard let url = URL(string: "https://api.openweathermap.org/data/3.0/onecall?lat=\(latitude)&lon=\(longitude)&part={part}&appid=\("e6af6d4c93cb421326c76e8dbd9cc6ee")&units=metric") else
-//            {fatalError("URL not found")}
-        
-        guard let url = URL(string: "https://api.openweathermap.org/data/3.0/onecall?lat=\(latitude)&lon=\(longitude)&appid=\("e6af6d4c93cb421326c76e8dbd9cc6ee")&units=metric") else
+        guard let url = URL(string: "https://api.openweathermap.org/data/3.0/onecall?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)&units=metric") else
             {fatalError("URL not found")}
         
         let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url)) //stored retrieved data in data and response variables
